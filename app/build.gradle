@@ -25,6 +25,12 @@ android {
     lintOptions {
         abortOnError false
     }
+    //百度地图配置SO文件的使用
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
@@ -47,8 +53,10 @@ dependencies {
     compile 'cn.leancloud.android:qq-sdk:1.6.1-leancloud'
     // 目前新浪微博官方只提供 jar 包的集成方式
     // 请手动下载新浪微博 SDK 的 jar 包，将其放在 libs 目录下进行集成
-    //    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/weiboSDKCore_3.1.4.jar')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //    compile files('libs/weiboSDKCore_3.1.4.jar')
     // LeanCloud 应用内搜索包
     compile 'cn.leancloud.android:avoscloud-search:v3.+@aar'
+    //百度地图需要的 jar 包依赖
+    //    compile files('libs/BaiduLBS_Android.jar')
 }
