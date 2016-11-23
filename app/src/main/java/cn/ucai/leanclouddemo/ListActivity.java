@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVGeoPoint;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
 
@@ -93,14 +94,20 @@ public class ListActivity extends AppCompatActivity {
             User u = getItem(position);
             if(u!=null){
                 holder.name.setText(u.getUsername()+","
-                        +getDistance(user.getUserPoint().distanceInMilesTo(u.getUserPoint())));
+                        +getDistance(u.getUserPoint()));
             }
             return convertView;
         }
 
-        String getDistance(Double point){
-            DecimalFormat decimalFormat =new DecimalFormat("0.00");//构造方法的字符格式这里如果小数不足2位,会以0补足.
-            return "距离你 "+decimalFormat.format(point) + " km";//format 返回的是字符串
+        String getDistance(AVGeoPoint point){
+            if(point!=null) {
+                if(point.getLatitude()!=0&&point.getLongitude()!=0) {
+                    Double l = user.getUserPoint().distanceInMilesTo(point);
+                    DecimalFormat decimalFormat = new DecimalFormat("0.00");//构造方法的字符格式这里如果小数不足2位,会以0补足.
+                    return "距离你 " + decimalFormat.format(l) + " km";//format 返回的是字符串
+                }
+            }
+            return "对方暂未开通定位";//format 返回的是字符串
         }
     }
 

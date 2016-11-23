@@ -152,22 +152,25 @@ public class MainActivity extends AppCompatActivity {
         public void onReceiveLocation(BDLocation location) {
             // TODO Auto-generated method stub
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
-                final AVGeoPoint point = new AVGeoPoint(location.getLatitude(),location.getLongitude());
-                String updateTime = location.getTime();
-                User currentUser = User.getCurrentUser(User.class);
-                Log.e("main","currentUser="+currentUser);
-                currentUser.setUserPoint(point);
-                currentUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(AVException e) {
-                        Log.e("main","setUserPoint e="+e);
-                        if(e==null){
-                            Log.e("main","save point success"+point);
-                            locationService.stop();
-                            startActivity(new Intent(MainActivity.this,ListActivity.class));
+                Log.e("main","Latitude="+location.getLatitude()+",Longitude="+location.getLongitude());
+                if(location.getLatitude()!=0&&location.getLongitude()!=0) {
+                    final AVGeoPoint point = new AVGeoPoint(location.getLatitude(), location.getLongitude());
+                    String updateTime = location.getTime();
+                    User currentUser = User.getCurrentUser(User.class);
+                    Log.e("main", "currentUser=" + currentUser);
+                    currentUser.setUserPoint(point);
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(AVException e) {
+                            Log.e("main", "setUserPoint e=" + e);
+                            if (e == null) {
+                                Log.e("main", "save point success" + point);
+                                locationService.stop();
+                                startActivity(new Intent(MainActivity.this, ListActivity.class));
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
 

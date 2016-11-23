@@ -18,13 +18,13 @@ public class MyLeanCloudApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+//        LeanCloud begin
         AVUser.alwaysUseSubUserClass(User.class);
         // 初始化参数依次为 this, AppId, AppKey
         AVOSCloud.initialize(this,"5FAl4q4NdF3OhFy2Vibg7IVa-gzGzoHsz","6QpR4hJnFdLu6QOQDVf9q0t9");
-        /***
-         * 初始化定位sdk，建议在Application中创建
-         */
+//        LeanCloud end
+
+//        初始化定位sdk，建议在Application中创建
         locationService = new LocationService(getApplicationContext());
         mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
         SDKInitializer.initialize(getApplicationContext());
