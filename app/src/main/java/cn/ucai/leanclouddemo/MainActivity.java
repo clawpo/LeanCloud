@@ -2,18 +2,16 @@ package cn.ucai.leanclouddemo;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.SaveCallback;
+import com.avos.avoscloud.AVGeoPoint;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 
 import java.util.ArrayList;
 
@@ -22,25 +20,46 @@ public class MainActivity extends AppCompatActivity {
     private final int SDK_PERMISSION_REQUEST = 127;
     private ListView FunctionList;
     private String permissionInfo;
+    private LocationService locationService;
+    TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTextView = (TextView) findViewById(R.id.textView1);
 
-        // 测试 SDK 是否正常工作的代码
-        AVObject testObject = new AVObject("TestObject");
-        testObject.put("words","Hello World!");
-        testObject.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(AVException e) {
-                if(e == null){
-                    Log.d("saved","success!");
-                }
-            }
-        });
+//        // 测试 SDK 是否正常工作的代码
+//        AVObject testObject = new AVObject("TestObject");
+//        testObject.put("words","Hello World!");
+//        testObject.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(AVException e) {
+//                if(e == null){
+//                    Log.d("saved","success!");
+//                }
+//            }
+//        });
         // after andrioid m,must request Permiision on runtime
         getPersimmions();
+        initLocation();
+    }
+
+    private void initLocation() {
+        // -----------location config ------------
+        locationService = ((MyLeanCloudApp) getApplication()).locationService;
+        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+        locationService.registerListener(mListener);
+        //注册监听
+        locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+        locationService.start();// 定位SDK
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // start之后会默认发起一次定位请求，开发者无须判断isstart并主动调用request
+        locationService.stop();
     }
 
     @TargetApi(23)
@@ -98,9 +117,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClick(View view){
-        Intent intent = new Intent(MainActivity.this, LocationActivity.class);
-        intent.putExtra("from", 0);
-        startActivity(intent);
-    }
+    /**
+     * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
+     *
+     */
+    private BDLocationListener mListener = new BDLocationListener() {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            // TODO Auto-generated method stub
+            if (null != location && location.getLocType() != BDLocation.TypeServerError) {
+                AVGeoPoint point = new AVGeoPoint(location.getLatitude(),location.getLongitude());
+                String updateTime = location.getTime();
+            }
+        }
+
+    };
 }
