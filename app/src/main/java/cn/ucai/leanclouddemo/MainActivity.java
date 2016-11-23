@@ -2,14 +2,20 @@ package cn.ucai.leanclouddemo;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVGeoPoint;
+import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.SaveCallback;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 
@@ -21,13 +27,15 @@ public class MainActivity extends AppCompatActivity {
     private ListView FunctionList;
     private String permissionInfo;
     private LocationService locationService;
-    TextView mTextView;
+    Button btnShow;
+    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextView = (TextView) findViewById(R.id.textView1);
+        btnShow = (Button) findViewById(R.id.btn_show);
+        btnLogout = (Button) findViewById(R.id.btn_logout);
 
 //        // 测试 SDK 是否正常工作的代码
 //        AVObject testObject = new AVObject("TestObject");
@@ -42,7 +50,24 @@ public class MainActivity extends AppCompatActivity {
 //        });
         // after andrioid m,must request Permiision on runtime
         getPersimmions();
-        initLocation();
+        setListener();
+    }
+
+    private void setListener() {
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AVUser.logOut();// 清除缓存用户对象
+                finish();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+            }
+        });
+        btnShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initLocation();
+            }
+        });
     }
 
     private void initLocation() {
@@ -127,8 +152,22 @@ public class MainActivity extends AppCompatActivity {
         public void onReceiveLocation(BDLocation location) {
             // TODO Auto-generated method stub
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
-                AVGeoPoint point = new AVGeoPoint(location.getLatitude(),location.getLongitude());
+                final AVGeoPoint point = new AVGeoPoint(location.getLatitude(),location.getLongitude());
                 String updateTime = location.getTime();
+                User currentUser = User.getCurrentUser(User.class);
+                Log.e("main","currentUser="+currentUser);
+                currentUser.setUserPoint(point);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        Log.e("main","setUserPoint e="+e);
+                        if(e==null){
+                            Log.e("main","save point success"+point);
+                            locationService.stop();
+                            startActivity(new Intent(MainActivity.this,ListActivity.class));
+                        }
+                    }
+                });
             }
         }
 

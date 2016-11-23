@@ -5,6 +5,7 @@ import android.app.Service;
 import android.os.Vibrator;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.avos.avoscloud.AVUser;
 import com.baidu.mapapi.SDKInitializer;
 
 /**
@@ -18,6 +19,7 @@ public class MyLeanCloudApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        AVUser.alwaysUseSubUserClass(User.class);
         // 初始化参数依次为 this, AppId, AppKey
         AVOSCloud.initialize(this,"5FAl4q4NdF3OhFy2Vibg7IVa-gzGzoHsz","6QpR4hJnFdLu6QOQDVf9q0t9");
         /***
@@ -26,6 +28,5 @@ public class MyLeanCloudApp extends Application {
         locationService = new LocationService(getApplicationContext());
         mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
         SDKInitializer.initialize(getApplicationContext());
-
     }
 }

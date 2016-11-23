@@ -8,9 +8,9 @@ import com.avos.avoscloud.AVUser;
  */
 
 public class User extends AVUser {
-    private static final String USER_NICK = "user_nick";
-    private static final String USER_SEX = "user_sex";
-    private static final String USER_POINT = "user_point";
+    public static final String USER_NICK = "user_nick";
+    public static final String USER_SEX = "user_sex";
+    public static final String USER_POINT = "user_point";
 
     public String getUserNick(){
         return getString(USER_NICK);
